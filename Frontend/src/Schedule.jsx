@@ -1,4 +1,4 @@
-import { API_URL } from './api.js'
+import { API_URL, apiFetch } from './api.js'
 import Slot from './Slot' 
 import {useState, useEffect} from 'react' 
 import './styles/Schedule.css'
@@ -80,7 +80,7 @@ export default function Schedule() {
         // Function fetches the schedule data to display it
         async function getSchedule() {
             try {
-                const res = await fetch(`${API_URL}/ScheduleData`) // HTTP request sent to backend
+                const res = await apiFetch(`${API_URL}/ScheduleData`) // HTTP request sent to backend
                 const data = await res.json() // Represent response into object format
 
                 data.forEach(currSlot => {
@@ -108,7 +108,7 @@ export default function Schedule() {
     async function onUpdateSchedule() {
         try {
             console.log("im trying to fetch data")
-            const res = await fetch(`${API_URL}/ScheduleData`)
+            const res = await apiFetch(`${API_URL}/ScheduleData`)
             const data = await res.json()
 
             setSlots((prevSlots) => {
@@ -215,4 +215,5 @@ export default function Schedule() {
         
     )
 }
+
 

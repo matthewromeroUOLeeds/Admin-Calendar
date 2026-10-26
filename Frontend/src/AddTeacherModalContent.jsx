@@ -1,4 +1,4 @@
-import { API_URL } from './api.js'
+import { API_URL, apiFetch } from './api.js'
 import {useState} from 'react'
 
 
@@ -46,7 +46,7 @@ export default function AddTeacherModalContent({onClose}) {
 
         if (isFormValid()) {
             try {
-                const res = await fetch(`${API_URL}/postTeacher`, {
+                const res = await apiFetch(`${API_URL}/postTeacher`, {
                     method: "POST",
                     headers: {'Content-Type': 'application/json',},
                     body: JSON.stringify(formData)

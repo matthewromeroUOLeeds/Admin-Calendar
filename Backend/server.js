@@ -1,41 +1,17 @@
-const express = require('express');
-const mysql = require('mysql2');
-const cors = require('cors');
-const bodyParser = require('body-parser')
-const fs = require('fs');
-const path = require('path');
-const app = express();
-app.use(bodyParser.json());
-app.use(cors())
 require('dotenv').config();
-
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    port: Number(process.env.DB_PORT),
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    ssl: {
-        ca: fs.readFileSync(
-            path.join(__dirname, 'certs', 'ca.pem')
-        ),
-        rejectUnauthorized: true
-    }
-})
-console.log({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME
-});
-
-db.connect((err) => {
-    if (err) {
-        console.error('MySQL connection failed:', err.code, err.message);
-        return;
-    }
-
-    console.log('Connected to Aiven MySQL');
-});
+const express = require('express');
+const cors = require('cors');
+const { installAuth } = require('./auth');
+const createDatabase = require('./database');
+const path = require('node:path');
+function createApp(db, authOptions) {
+const app = express();
+app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+app.use(express.json({ limit: '32kb' }));
+// Optional same-origin deployment: build Frontend/dist and serve it with the API.
+app.use(express.static(path.join(__dirname, '..', 'Frontend', 'dist')));
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+installAuth(app, db, authOptions);
 
 app.get('/', (re, res) => {
     return res.json("Hello This is the start of your journey here in the ohm admin panel")
@@ -144,7 +120,6 @@ app.delete('/deleteClass/:classID', (req, res) => {
 
 app.post('/postStudent', (req, res) => {
     console.log("Student post...")
-    console.log(req.body)
 
     //  SQL query - Alters Students table
     const sql = "INSERT INTO Students (firstName, lastName, email) VALUES (?,?,?)"
@@ -163,7 +138,6 @@ app.post('/postStudent', (req, res) => {
 
 app.post('/postTeacher', (req, res) => {
     console.log("Teachers post...")
-    console.log(req.body)
 
     const sql = "INSERT INTO Teachers (firstName, lastName, email) VALUES (?,?,?)"
     db.query(sql, [req.body.firstName, req.body.lastName, req.body.email], (err, result) => {
@@ -177,7 +151,6 @@ app.post('/postTeacher', (req, res) => {
 
 app.post('/postClass', (req, res) => {
     console.log("Class Post...");
-    console.log(req.body);
     //Properties for Class record are placed into object for insertion into DB
     const classContent = {
         name: req.body.name,
@@ -221,7 +194,6 @@ app.post('/postClass', (req, res) => {
 
 app.post('/postClassesTaken', (req, res) => {
     console.log("Classes Taken POST...")
-    console.log(req.body)
     //Properties from body object declared as variables
     const studentsToAdd = req.body.studentsToAdd;
     const studentsToRemove = req.body.studentsToRemove;
@@ -245,9 +217,9 @@ app.post('/postClassesTaken', (req, res) => {
     //Array of promises, each one represents the success or failure of removing student from class
     const removeStudentPromises = studentsToRemove.map(student => {
         // Parameterized SQL query remove record into ClassesTaken table
-        const removeSQL = `DELETE FROM ClassesTaken WHERE takenStudentID=${student} AND takenClassID=${classID}`
+        const removeSQL = "DELETE FROM ClassesTaken WHERE takenStudentID = ? AND takenClassID = ?"
         return new Promise((resolve, reject) => {
-            db.query(removeSQL, (err, result) => {
+            db.query(removeSQL, [student, classID], (err, result) => {
                 if(err) reject(err); //if error return failure
                 else {
                     console.log("1 ClassesTaken record deleted")
@@ -274,8 +246,17 @@ app.post('/postClassesTaken', (req, res) => {
 })
 
 
-const port = Number(process.env.PORT || 8081);
-
-app.listen(port, '0.0.0.0', () => {
-    console.log(`Listening on port ${port}`);
+app.use((err, req, res, next) => {
+    console.error('Request failed:', err.code || err.message);
+    res.status(500).json({ error: 'Request failed. Please try again.' });
 });
+
+return app;
+}
+
+module.exports = { createApp };
+if (require.main === module) {
+    const app = createApp(createDatabase());
+    const port = Number(process.env.PORT || 8081);
+    app.listen(port, '0.0.0.0', () => console.log(`Listening on port ${port}`));
+}

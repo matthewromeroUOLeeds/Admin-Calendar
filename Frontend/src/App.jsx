@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react'
+import AuthGate from './AuthGate'
 import './styles/App.css'
 import Title from './Title'
 import Schedule from './Schedule'
@@ -11,7 +11,7 @@ import AddClassModal from './AddClassModal'
 function App() {
 
   return (
-    <div className='app'>
+    <AuthGate><div className='app'>
       <nav>
         <Title />
         <AddStudentModal /> 
@@ -19,8 +19,9 @@ function App() {
         <AddClassModal />
       </nav>
       <Schedule /> 
-    </div>
+    </div></AuthGate>
   )
 }
 
 export default App
+
