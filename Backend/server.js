@@ -1,18 +1,41 @@
 const express = require('express');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const cors = require('cors');
 const bodyParser = require('body-parser')
-
+const fs = require('fs');
+const path = require('path');
 const app = express();
 app.use(bodyParser.json());
 app.use(cors())
+require('dotenv').config();
 
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'csia',
-    password: 'Computer',
-    database: 'admin_panel'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    port: Number(process.env.DB_PORT),
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    ssl: {
+        ca: fs.readFileSync(
+            path.join(__dirname, 'certs', 'ca.pem')
+        ),
+        rejectUnauthorized: true
+    }
 })
+console.log({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME
+});
+
+db.connect((err) => {
+    if (err) {
+        console.error('MySQL connection failed:', err.code, err.message);
+        return;
+    }
+
+    console.log('Connected to Aiven MySQL');
+});
 
 app.get('/', (re, res) => {
     return res.json("Hello This is the start of your journey here in the ohm admin panel")
@@ -250,6 +273,6 @@ app.post('/postClassesTaken', (req, res) => {
 
 })
 
-app.listen(8081, () => {
+app.listen(process.env.PORT, () => {
     console.log("listening")
 })
