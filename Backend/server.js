@@ -273,6 +273,9 @@ app.post('/postClassesTaken', (req, res) => {
 
 })
 
-app.listen(process.env.PORT, () => {
-    console.log("listening")
-})
+
+const port = Number(process.env.PORT || 8081);
+
+app.listen(port, '0.0.0.0', () => {
+    console.log(`Listening on port ${port}`);
+});
