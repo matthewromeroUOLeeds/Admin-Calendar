@@ -1,0 +1,9 @@
+.slot {
+    display: block;
+    border: 1px solid black;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    hyphens: auto;
+    font-size: 0.7rem;
+}

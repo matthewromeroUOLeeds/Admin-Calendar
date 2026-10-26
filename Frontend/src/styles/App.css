@@ -1,0 +1,9 @@
+.app {
+    height: 100vh;
+    margin: 0;
+}
+
+nav {
+    display: flex;
+    gap: 2rem;
+}
