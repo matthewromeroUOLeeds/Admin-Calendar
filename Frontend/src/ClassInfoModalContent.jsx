@@ -1,3 +1,4 @@
+import { API_URL } from './api.js'
 import {useEffect, useState} from 'react'
 import EditStudentsModal from './EditStudentsModal'
 import './styles/ClassInfo.css'
@@ -20,7 +21,7 @@ export default function ClassInfoModalContent(props) {
     useEffect (() => {
         // Data from database is retrieved regarding the class
         async function getClassData() {
-            const res = await fetch(`http://localhost:8081/getClassInfo/${content.scheduleClassID}`) //HTTP request sent
+            const res = await fetch(`${API_URL}/getClassInfo/${content.scheduleClassID}`) //HTTP request sent
             const data = await res.json() // Formatting of JSON data
 
             // Data is in form {[], []}
@@ -30,7 +31,7 @@ export default function ClassInfoModalContent(props) {
     }, [content.scheduleClassID])
 
     const updateClassData = async () => {
-        const res = await fetch(`http://localhost:8081/getClassInfo/${content.scheduleClassID}`);
+        const res = await fetch(`${API_URL}/getClassInfo/${content.scheduleClassID}`);
         const data = await res.json();
         setClassData(data);
     };
@@ -65,7 +66,7 @@ export default function ClassInfoModalContent(props) {
         //HTTP request sent with path parameter.
         //Method is specified
         //Header specifies what data it expects from the server response
-        const res = await fetch(`http://localhost:8081/deleteClass/${content.scheduleClassID}`, {
+        const res = await fetch(`${API_URL}/deleteClass/${content.scheduleClassID}`, {
             method: "DELETE",
             headers: {'Content-Type': 'application/json',},
         })

@@ -1,3 +1,4 @@
+import { API_URL } from './api.js'
 import {useState} from 'react'
 
 
@@ -45,7 +46,7 @@ export default function AddTeacherModalContent({onClose}) {
 
         if (isFormValid()) {
             try {
-                const res = await fetch(`http://localhost:8081/postTeacher`, {
+                const res = await fetch(`${API_URL}/postTeacher`, {
                     method: "POST",
                     headers: {'Content-Type': 'application/json',},
                     body: JSON.stringify(formData)

@@ -1,3 +1,4 @@
+import { API_URL } from './api.js'
 import {useState, useEffect} from 'react'
 
 const initialSchedule = [
@@ -19,7 +20,7 @@ export default function AddClassModalContent({onClose}) {
     useEffect(() => {
         async function getTeachers() {
             try {
-                const res = await fetch('http://localhost:8081/getTeachers');//HTTP request
+                const res = await fetch(`${API_URL}/getTeachers`);//HTTP request
                 const data = await res.json();
                 
                 console.log(data)
@@ -152,7 +153,7 @@ export default function AddClassModalContent({onClose}) {
 
     async function checkSpace() {
         //HTTP request returns all schedule records that are located in room chosen by user
-        const res = await fetch(`http://localhost:8081/getSchedule/${formData.room}`)
+        const res = await fetch(`${API_URL}/getSchedule/${formData.room}`)
         const data = await res.json()
         //Array of days where class is scheduled with valid start and end times
         const newClassDays = formData.schedule.filter((day) => day.endTime < 100 && day.startTime > -1)
@@ -189,7 +190,7 @@ export default function AddClassModalContent({onClose}) {
         //Validation for adding class
         if (formIsValid() && isAvailable) {
             try {
-                const res = await fetch(`http://localhost:8081/postClass`, { //POST HTTP request
+                const res = await fetch(`${API_URL}/postClass`, { //POST HTTP request
                     method: "POST",
                     //Form data is being sent as request, so body and headers match this accordingly
                     headers: {'Content-Type': 'application/json',},

@@ -1,3 +1,4 @@
+import { API_URL } from './api.js'
 import {useState, useEffect} from 'react'
 
 
@@ -28,7 +29,7 @@ export default function EditStudentsModalContent(props) {
     //Run on initial render
     useEffect(() => {
         async function getStudents() {
-            const res = await fetch('http://localhost:8081/getStudents') //HTTP Request sent
+            const res = await fetch(`${API_URL}/getStudents`) //HTTP Request sent
             const data = await res.json()
             // Students sorted alphabetically
             const sortedData = sortStudents(data)
@@ -98,7 +99,7 @@ export default function EditStudentsModalContent(props) {
         //studentsToAdd, studentsToRemove - arrays of studentIDs 
         const requestBody = {studentsToAdd: studentsToAdd, studentsToRemove: studentsToRemove, classID: props.class}
 
-        const res = await fetch('http://localhost:8081/postClassesTaken', {
+        const res = await fetch(`${API_URL}/postClassesTaken`, {
             //POST action
             method: 'POST',
             //Headers and body specified to accomodate the type of request

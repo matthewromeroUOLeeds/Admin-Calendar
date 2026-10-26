@@ -1,3 +1,4 @@
+import { API_URL } from './api.js'
 import {useState} from 'react'
 
 export default function AddStudentModalContent({onClose}) {
@@ -47,7 +48,7 @@ export default function AddStudentModalContent({onClose}) {
         if (isFormValid()) {
             try {
                 //HTTP POST request is sent.
-                const res = await fetch(`http://localhost:8081/postStudent`, {
+                const res = await fetch(`${API_URL}/postStudent`, {
                     method: "POST",
                     headers: {'Content-Type': 'application/json',},
                     body: JSON.stringify(formData)
